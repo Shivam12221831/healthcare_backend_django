@@ -1,57 +1,11 @@
-# from rest_framework import viewsets, permissions, generics
-# from django.shortcuts import get_object_or_404
-# from .models import Patient, Doctor, PatientDoctorMapping
-# from .serializers import PatientSerializer, DoctorSerializer, MappingSerializer
-# from .permissions import IsOwnerOfPatient
-
-# class PatientViewSet(viewsets.ModelViewSet):
-#     serializer_class = PatientSerializer
-#     permission_classes = [permissions.IsAuthenticated, IsOwnerOfPatient]
-
-#     def get_queryset(self):
-#         return Patient.objects.filter(created_by=self.request.user).order_by("-created_at")
-
-# class DoctorViewSet(viewsets.ModelViewSet):
-#     serializer_class = DoctorSerializer
-#     queryset = Doctor.objects.all().order_by("name")
-
-#     def get_permissions(self):
-#         if self.request.method in permissions.SAFE_METHODS:
-#             return [permissions.AllowAny()]
-#         return [permissions.IsAuthenticated()]
-
-# class MappingViewSet(viewsets.ModelViewSet):
-#     serializer_class = MappingSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         return PatientDoctorMapping.objects.filter(patient__created_by=self.request.user).select_related("patient", "doctor").order_by("-created_at")
-
-# class DoctorsForPatientView(generics.ListAPIView):
-#     serializer_class = DoctorSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         patient_id = self.kwargs["patient_id"]
-#         patient = get_object_or_404(Patient, pk=patient_id, created_by=self.request.user)
-#         return Doctor.objects.filter(mappings__patient=patient).distinct().order_by("name")
-
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 from .models import Patient, Doctor, PatientDoctorMapping
 from .serializers import PatientSerializer, DoctorSerializer, PatientDoctorMappingSerializer
 from .permissions import IsOwner
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 
-# class PatientListCreateView(generics.ListCreateAPIView):
-#     serializer_class = PatientSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         return Patient.objects.filter(created_by=self.request.user)
-
-#     def perform_create(self, serializer):
-#         serializer.save(created_by=self.request.user)
 class PatientListCreateView(generics.ListCreateAPIView):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -81,7 +35,7 @@ class PatientDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
-        return Patient.objects.filter(user=self.request.user)
+        return Patient.objects.filter(created_by=self.request.user)
 
 class DoctorListCreateView(generics.ListCreateAPIView):
     queryset = Doctor.objects.all()
@@ -112,3 +66,25 @@ class PatientDoctorMappingDeleteView(generics.DestroyAPIView):
     queryset = PatientDoctorMapping.objects.all()
     serializer_class = PatientDoctorMappingSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        """
+        Override the perform_destroy method to add custom response
+        after deleting the instance.
+        """
+        # Perform the actual deletion of the object
+        instance.delete()
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Override the delete method to provide a custom response
+        after the object is deleted.
+        """
+        # Call the original delete method to delete the object
+        response = super().delete(request, *args, **kwargs)
+
+        # Return a custom success message after deletion
+        return Response(
+            {"detail": "Patient-Doctor mapping successfully deleted."},
+            status=status.HTTP_204_NO_CONTENT
+        )

@@ -14,37 +14,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-# from django.contrib import admin
-# from django.urls import path
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-# ]
-
-# from django.contrib import admin
-# from django.urls import path, include
-# from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-# from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView  # optional
-
-# urlpatterns = [
-#     path("admin/", admin.site.urls),
-
-#     # JWT token endpoints
-#     path("api/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-#     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-
-#     # registration endpoint in accounts app
-#     path("api/auth/", include("accounts.urls")),
-
-#     # clinic app routes
-#     path("api/", include("clinic.urls")),
-# ]
-
-# # # optional OpenAPI
-# urlpatterns += [
-#     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-#     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),
-# ]
 
 from django.contrib import admin
 from django.urls import path, include

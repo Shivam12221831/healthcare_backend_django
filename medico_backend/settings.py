@@ -49,10 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'accounts',
-    'patients',
-    'doctors',
     "clinic",
-    'mappings',
     "drf_spectacular",  # optional
 ]
 
@@ -89,13 +86,6 @@ WSGI_APPLICATION = 'medico_backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {
